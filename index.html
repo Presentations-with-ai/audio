@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Ringtones</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #111827;
+    }
+
+    button, input, a {
+      font-family: inherit;
+    }
+
+    .app-shell {
+      width: min(1180px, calc(100% - 22px));
+      margin: 0 auto;
+      padding: 18px 0 34px;
+    }
+
+    .top-panel {
+      position: sticky;
+      top: 12px;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.58);
+      border-radius: 24px;
+      box-shadow: 0 18px 44px rgba(15, 23, 42, 0.18);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 16px;
+      margin-bottom: 18px;
+      animation: fade 0.35s ease;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 13px;
+    }
+
+    .brand {
+      min-width: 0;
+    }
+
+    h1 {
+      margin: 0;
+      color: #111827;
+      font-size: clamp(24px, 4vw, 34px);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: #6b7280;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .counter-pill {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 78px;
+      padding: 10px 13px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+      border: 1px solid rgba(99, 102, 241, 0.18);
+      color: #4f46e5;
+      font-size: 13px;
+      font-weight: 900;
+      box-shadow: 0 10px 24px rgba(99, 102, 241, 0.10);
+    }
+
+    .search-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search {
+      width: 100%;
+      border: 1px solid #c7d2fe;
+      border-radius: 17px;
+      background: #f8fafc;
+      padding: 14px 15px;
+      color: #111827;
+      font-size: 16px;
+      font-weight: 700;
+      outline: none;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4);
+      transition: 0.18s ease;
+    }
+
+    .search:focus {
+      border-color: #6366f1;
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+    }
+
+    .clear-btn {
+      flex: 0 0 auto;
+      width: 48px;
+      height: 48px;
+      border: none;
+      border-radius: 16px;
+      background: #eef2ff;
+      color: #4f46e5;
+      font-size: 22px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(99, 102, 241, 0.13);
+      transition: 0.18s ease;
+    }
+
+    .clear-btn:hover {
+      transform: translateY(-1px);
+      background: #e0e7ff;
+    }
+
+    .now-playing {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #ecfdf5 0%, #eff6ff 100%);
+      border: 1px solid rgba(34, 197, 94, 0.20);
+      color: #166534;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .now-playing.is-visible {
+      display: flex;
+    }
+
+    .now-title {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .stop-btn {
+      flex: 0 0 auto;
+      border: none;
+      border-radius: 999px;
+      background: #ffffff;
+      color: #166534;
+      font-weight: 900;
+      padding: 8px 11px;
+      cursor: pointer;
+      box-shadow: 0 8px 16px rgba(22, 101, 52, 0.10);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 12px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+      animation: fade 0.4s ease;
+      color: #111827;
+      overflow: hidden;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 38px rgba(15, 23, 42, 0.22);
+    }
+
+    .cover-wrap {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #eef2ff;
+      aspect-ratio: 1 / 1;
+      border: 1px solid rgba(99, 102, 241, 0.13);
+    }
+
+    .cover {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.25s ease;
+    }
+
+    .card:hover .cover {
+      transform: scale(1.025);
+    }
+
+    .play-bubble {
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.55);
+      background: rgba(255, 255, 255, 0.88);
+      color: #4f46e5;
+      box-shadow: 0 12px 22px rgba(15, 23, 42, 0.18);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .title {
+      margin: 11px 2px 10px;
+      min-height: 42px;
+      color: #111827;
+      font-size: 14px;
+      line-height: 1.25;
+      font-weight: 850;
+      word-break: break-word;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      min-height: 44px;
+      padding: 11px 8px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1;
+      transition: 0.18s ease;
+      user-select: none;
+    }
+
+    .play-btn {
+      background: linear-gradient(135deg, #4338ca 0%, #7c3aed 100%);
+      color: #ffffff;
+      box-shadow: 0 12px 24px rgba(79, 70, 229, 0.24);
+    }
+
+    .download-btn {
+      background: #eef2ff;
+      color: #3730a3;
+      border: 1px solid #c7d2fe;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+    }
+
+    .play-btn.is-playing {
+      background: linear-gradient(135deg, #16a34a 0%, #0f766e 100%);
+      box-shadow: 0 12px 24px rgba(22, 163, 74, 0.24);
+    }
+
+    .card.is-playing {
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.30), 0 18px 38px rgba(15, 23, 42, 0.22);
+    }
+
+    .empty {
+      display: none;
+      background: rgba(255,255,255,0.92);
+      border-radius: 22px;
+      padding: 24px;
+      text-align: center;
+      color: #374151;
+      font-weight: 800;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+    }
+
+    .empty.is-visible {
+      display: block;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 700px) {
+      .app-shell {
+        width: min(100% - 18px, 640px);
+        padding-top: 10px;
+      }
+
+      .top-panel {
+        top: 8px;
+        border-radius: 21px;
+        padding: 14px;
+      }
+
+      .brand-row {
+        align-items: flex-start;
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px;
+      }
+
+      .card {
+        border-radius: 17px;
+        padding: 9px;
+      }
+
+      .cover-wrap {
+        border-radius: 14px;
+      }
+
+      .title {
+        font-size: 12.5px;
+        min-height: 48px;
+        margin: 9px 1px 9px;
+      }
+
+      .actions {
+        gap: 7px;
+      }
+
+      .btn {
+        min-height: 40px;
+        font-size: 12.5px;
+        border-radius: 12px;
+        padding: 10px 5px;
+      }
+
+      .counter-pill {
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+
+      .search {
+        padding: 13px 14px;
+        font-size: 15px;
+        border-radius: 15px;
+      }
+
+      .clear-btn {
+        width: 46px;
+        height: 46px;
+        border-radius: 15px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-shell">
+    <section class="top-panel">
+      <div class="brand-row">
+        <div class="brand">
+          <h1>Ringtones</h1>
+          <div class="subtitle">Фото, прослушивание и скачивание мелодий</div>
+        </div>
+        <div class="counter-pill" id="counter">0 / 0</div>
+      </div>
+
+      <div class="search-wrap">
+        <input id="search" class="search" type="search" placeholder="Поиск мелодии..." autocomplete="off" />
+        <button id="clearSearch" class="clear-btn" type="button" title="Очистить поиск">×</button>
+      </div>
+
+      <div id="nowPlaying" class="now-playing">
+        <div class="now-title" id="nowTitle">Сейчас играет</div>
+        <button class="stop-btn" id="stopBtn" type="button">Стоп</button>
+      </div>
+    </section>
+
+    <main id="grid" class="grid"></main>
+    <div id="empty" class="empty">Ничего не найдено</div>
+  </div>
+
+  <audio id="player" preload="none"></audio>
+
+  <script>
+    const tracks = [
+  {
+    "title": "9mm Loli - Memphis Cult (Ringtone)",
+    "image": "9mm%20Loli%20-%20Memphis%20Cult%20%28Ringtone%29.jpg",
+    "audio": "9mm%20Loli%20-%20Memphis%20Cult%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "[iPhone intro] Squid Game - Round and Round Mingle (Ringtone)",
+    "image": "%5BiPhone%20intro%5D%20Squid%20Game%20-%20Round%20and%20Round%20Mingle%20%28Ringtone%29.jpg",
+    "audio": "%5BiPhone%20intro%5D%20Squid%20Game%20-%20Round%20and%20Round%20Mingle%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "A Pimp Named Slickback (Ringtone)",
+    "image": "A%20Pimp%20Named%20Slickback%20%28Ringtone%29.jpg",
+    "audio": "A%20Pimp%20Named%20Slickback%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "AFIA Oil - Rami Org (Ringtone)",
+    "image": "AFIA%20Oil%20-%20Rami%20Org%20%28Ringtone%29.jpg",
+    "audio": "AFIA%20Oil%20-%20Rami%20Org%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "All I Want For Christmas Is You (Ringtone)",
+    "image": "All%20I%20Want%20For%20Christmas%20Is%20You%20%28Ringtone%29.jpg",
+    "audio": "All%20I%20Want%20For%20Christmas%20Is%20You%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "All My Fellas - Frizk (Ringtone)",
+    "image": "All%20My%20Fellas%20-%20Frizk%20%28Ringtone%29.jpg",
+    "audio": "All%20My%20Fellas%20-%20Frizk%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "APT. - Rosé & Bruno Mars (Ringtone)",
+    "image": "APT.%20-%20Ros%C3%A9%20%26%20Bruno%20Mars%20%28Ringtone%29.jpg",
+    "audio": "APT.%20-%20Ros%C3%A9%20%26%20Bruno%20Mars%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Assumptions - Blue Shirt Guy Dancing (Marimba Ringtone)",
+    "image": "Assumptions%20-%20Blue%20Shirt%20Guy%20Dancing%20%28Marimba%20Ringtone%29.jpg",
+    "audio": "Assumptions%20-%20Blue%20Shirt%20Guy%20Dancing%20%28Marimba%20Ringtone%29.mp3"
+  },
+  {
+    "title": "Attack on Titan - Guren no Yumiya (Ringtone)",
+    "image": "Attack%20on%20Titan%20-%20Guren%20no%20Yumiya%20%28Ringtone%29.jpg",
+    "audio": "Attack%20on%20Titan%20-%20Guren%20no%20Yumiya%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Banana Song (Marimba Intro)",
+    "image": "Banana%20Song%20-%20Minions%20%28Ringtone%29.jpg",
+    "audio": "Banana%20Song%20%28Marimba%20Intro%29.mp3"
+  },
+  {
+    "title": "Barbie Girl (Ringtone)",
+    "image": "Barbie%20Girl%20%28Ringtone%29.jpg",
+    "audio": "Barbie%20Girl%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Barbie World - Nicki Minaj & Ice Spice (Ringtone)",
+    "image": "Barbie%20World%20-%20Nicki%20Minaj%20%26%20Ice%20Spice%20%28Ringtone%29.jpg",
+    "audio": "Barbie%20World%20-%20Nicki%20Minaj%20%26%20Ice%20Spice%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Bella Ciao (Ringtone)",
+    "image": "Bella%20Ciao%20%28Ringtone%29.jpg",
+    "audio": "Bella%20Ciao%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Binks no Sake (Alt Intro)",
+    "image": "Binks%20no%20Sake%20-%20One%20Piece%20%28Ringtone%29.jpg",
+    "audio": "Binks%20no%20Sake%20%28Alt%20Intro%29.mp3"
+  },
+  {
+    "title": "Bleach - Number One x Ichigo's Theme (Ringtone)",
+    "image": "Bleach%20-%20Number%20One%20x%20Ichigo%27s%20Theme%20%28Ringtone%29.jpg",
+    "audio": "Bleach%20-%20Number%20One%20x%20Ichigo%27s%20Theme%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Bling Bang Bang Born - MASHLE (Ringtone)",
+    "image": "Bling%20Bang%20Bang%20Born%20-%20MASHLE%20%28Ringtone%29.jpg",
+    "audio": "Bling%20Bang%20Bang%20Born%20-%20MASHLE%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Bomboclat - Gata Only (Ringtone)",
+    "image": "Bomboclat%20-%20Gata%20Only%20%28Ringtone%29.jpg",
+    "audio": "Bomboclat%20-%20Gata%20Only%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Bon Voyage! - One Piece (Ringtone)",
+    "image": "Bon%20Voyage%21%20-%20One%20Piece%20%28Ringtone%29.jpg",
+    "audio": "Bon%20Voyage%21%20-%20One%20Piece%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "BTS - SWIM (Ringtone Cover)",
+    "image": "BTS%20-%20SWIM%20%28Ringtone%20Cover%29.jpg",
+    "audio": "BTS%20-%20SWIM%20%28Ringtone%20Cover%29.mp3"
+  },
+  {
+    "title": "Bumble Bee (Ringtone)",
+    "image": "Bumble%20Bee%20%28Ringtone%29.jpg",
+    "audio": "Bumble%20Bee%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Bunny Girl Senpai (Ringtone)",
+    "image": "Bunny%20Girl%20Senpai%20%28Ringtone%29.jpg",
+    "audio": "Bunny%20Girl%20Senpai%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Calm Down - Rema (Ringtone)",
+    "image": "Calm%20Down%20-%20Rema%20%28Ringtone%29.jpg",
+    "audio": "Calm%20Down%20-%20Rema%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Carousel - Montagem Tomada (Ringtone)",
+    "image": "Carousel%20-%20Montagem%20Tomada%20%28Ringtone%29.jpg",
+    "audio": "Carousel%20-%20Montagem%20Tomada%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Cat Marimba (Ringtone)",
+    "image": "Cat%20Marimba%20%28Ringtone%29.jpg",
+    "audio": "Cat%20Marimba%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Chainsaw Man (Ringtone) - KICK BACK",
+    "image": "Chainsaw%20Man%20%28Ringtone%29%20-%20KICK%20BACK.jpg",
+    "audio": "Chainsaw%20Man%20%28Ringtone%29%20-%20KICK%20BACK.mp3"
+  },
+  {
+    "title": "CHEGOU 3 - shonci (Phonk House Ringtone)",
+    "image": "CHEGOU%203%20-%20shonci%20%28Phonk%20House%20Ringtone%29.jpg",
+    "audio": "CHEGOU%203%20-%20shonci%20%28Phonk%20House%20Ringtone%29.mp3"
+  },
+  {
+    "title": "Chess Type Beat - Rat & Roblox Dance (Ringtone)",
+    "image": "Chess%20Type%20Beat%20-%20Rat%20%26%20Roblox%20Dance%20%28Ringtone%29.jpg",
+    "audio": "Chess%20Type%20Beat%20-%20Rat%20%26%20Roblox%20Dance%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Chill Guy Song (Ringtone)",
+    "image": "Chill%20Guy%20Song%20%28Ringtone%29.jpg",
+    "audio": "Chill%20Guy%20Song%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Chinese Funk - Midu Echoing (Phonk Ringtone)",
+    "image": "Chinese%20Funk%20-%20Midu%20Echoing%20%28Phonk%20Ringtone%29.jpg",
+    "audio": "Chinese%20Funk%20-%20Midu%20Echoing%20%28Phonk%20Ringtone%29.mp3"
+  },
+  {
+    "title": "Choose your Character - Smash Bros (Ringtone)",
+    "image": "Choose%20your%20Character%20-%20Smash%20Bros%20%28Ringtone%29.jpg",
+    "audio": "Choose%20your%20Character%20-%20Smash%20Bros%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Cupid (Ringtone) - Fifty Fifty",
+    "image": "Cupid%20%28Ringtone%29%20-%20Fifty%20Fifty.jpg",
+    "audio": "Cupid%20%28Ringtone%29%20-%20Fifty%20Fifty.mp3"
+  },
+  {
+    "title": "DAN DA DAN - Creepy Nuts (Ringtone)",
+    "image": "DAN%20DA%20DAN%20-%20Creepy%20Nuts%20%28Ringtone%29.jpg",
+    "audio": "DAN%20DA%20DAN%20-%20Creepy%20Nuts%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Dance! (Ringtone)",
+    "image": "Dance%21%20%28Ringtone%29.jpg",
+    "audio": "Dance%21%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Dancin - Aaron Smith (Ringtone)",
+    "image": "Dancin%20-%20Aaron%20Smith%20%28Ringtone%29.jpg",
+    "audio": "Dancin%20-%20Aaron%20Smith%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "DBZ Teleport (Alarm Tone)",
+    "image": "DBZ%20Teleport%20%28Alarm%20Tone%29.jpg",
+    "audio": "DBZ%20Teleport%20%28Alarm%20Tone%29.mp3"
+  },
+  {
+    "title": "Death Note - The WORLD (Ringtone)",
+    "image": "Death%20Note%20-%20The%20WORLD%20%28Ringtone%29.jpg",
+    "audio": "Death%20Note%20-%20The%20WORLD%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Demon Slayer (Ringtone) - Gurenge",
+    "image": "Demon%20Slayer%20%28Ringtone%29%20-%20Gurenge.jpg",
+    "audio": "Demon%20Slayer%20%28Ringtone%29%20-%20Gurenge.mp3"
+  },
+  {
+    "title": "Den Den Mushi - One Piece (Ringtone)",
+    "image": "Den%20Den%20Mushi%20-%20One%20Piece%20%28Ringtone%29.jpg",
+    "audio": "Den%20Den%20Mushi%20-%20One%20Piece%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Did I Stutter - (Ringtone)",
+    "image": "Did%20I%20Stutter%20-%20%20%28Ringtone%29.jpg",
+    "audio": "Did%20I%20Stutter%20-%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Doodle - Anime (Ringtone)",
+    "image": "Doodle%20-%20Anime%20%28Ringtone%29.jpg",
+    "audio": "Doodle%20-%20Anime%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Dr Tony Chopper Song - One Piece (Marimba Ringtone)",
+    "image": "Dr%20Tony%20Chopper%20Song%20-%20One%20Piece%20%28Marimba%20Ringtone%29.jpg",
+    "audio": "Dr%20Tony%20Chopper%20Song%20-%20One%20Piece%20%28Marimba%20Ringtone%29.mp3"
+  },
+  {
+    "title": "Dragon Ball - Makafushigi Adventure (Ringtone)",
+    "image": "Dragon%20Ball%20-%20Makafushigi%20Adventure%20%28Ringtone%29.jpg",
+    "audio": "Dragon%20Ball%20-%20Makafushigi%20Adventure%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Dragon Ball GT (iPhone Intro)",
+    "image": "Dragon%20Ball%20GT%20%28Ringtone%29.jpg",
+    "audio": "Dragon%20Ball%20GT%20%28iPhone%20Intro%29.mp3"
+  },
+  {
+    "title": "Dragon Ball Z (Ringtone) - Cha La Head Cha La",
+    "image": "Dragon%20Ball%20Z%20%28Ringtone%29%20-%20Cha%20La%20Head%20Cha%20La.jpg",
+    "audio": "Dragon%20Ball%20Z%20%28Ringtone%29%20-%20Cha%20La%20Head%20Cha%20La.mp3"
+  },
+  {
+    "title": "Dragon Ball Z - Prologue Song (Ringtone)",
+    "image": "Dragon%20Ball%20Z%20-%20Prologue%20Song%20%28Ringtone%29.jpg",
+    "audio": "Dragon%20Ball%20Z%20-%20Prologue%20Song%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Dream Alarm - Techno Remix (Alarm)",
+    "image": "Dream%20Alarm%20-%20Techno%20Remix%20%28Alarm%29.jpg",
+    "audio": "Dream%20Alarm%20-%20Techno%20Remix%20%28Alarm%29.mp3"
+  },
+  {
+  "title": "Driftveil City - Pokémon - Toothless",
+  "image": "Driftveil%20City%20-%20Pok%E2%80%8B%C3%A9%E2%80%8Bmon%20%20-%20%20Toothless%20%28Ringtone%29.jpg",
+  "audio": "Driftveil%20City%20-%20Pok%E2%80%8B%C3%A9%E2%80%8Bmon%20-%20Toothless.mp3"
+  },
+  {
+    "title": "Drums of Liberation - One Piece (Alt Version)",
+    "image": "Drums%20of%20Liberation%20-%20One%20Piece%20%28Alt%20Version%29.jpg",
+    "audio": "Drums%20of%20Liberation%20-%20One%20Piece%20%28Alt%20Version%29.mp3"
+  },
+  {
+    "title": "Egypt Trend Song (Ringtone)",
+    "image": "Egypt%20Trend%20Song%20%28Ringtone%29.jpg",
+    "audio": "Egypt%20Trend%20Song%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Eminem - The Real Slim Shady (Ringtone)",
+    "image": "Eminem%20-%20The%20Real%20Slim%20Shady%20%28Ringtone%29.jpg",
+    "audio": "Eminem%20-%20The%20Real%20Slim%20Shady%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "English or Spanish - Static (Ringtone)",
+    "image": "English%20or%20Spanish%20-%20Static%20%28Ringtone%29.jpg",
+    "audio": "English%20or%20Spanish%20-%20Static%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Epic Sax Guy - Squirtle (Ringtone)",
+    "image": "Epic%20Sax%20Guy%20-%20Squirtle%20%28Ringtone%29.jpg",
+    "audio": "Epic%20Sax%20Guy%20-%20Squirtle%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "ETA - NewJeans (Ringtone)",
+    "image": "ETA%20-%20NewJeans%20%28Ringtone%29.jpg",
+    "audio": "ETA%20-%20NewJeans%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Fairy Fountain - Zelda (Ringtone)",
+    "image": "Fairy%20Fountain%20-%20Zelda%20%28Ringtone%29.jpg",
+    "audio": "Fairy%20Fountain%20-%20Zelda%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Fairy Tail - Theme (Ringtone)",
+    "image": "Fairy%20Tail%20-%20Theme%20%28Ringtone%29.jpg",
+    "audio": "Fairy%20Tail%20-%20Theme%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "FE!N - Travis Scott x Nokia (Ringtone)",
+    "image": "FE%21N%20-%20Travis%20Scott%20x%20Nokia%20%28Ringtone%29.jpg",
+    "audio": "FE%21N%20-%20Travis%20Scott%20x%20Nokia%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Flowers - Miley Cyrus (Ringtone)",
+    "image": "Flowers%20-%20Miley%20Cyrus%20%28Ringtone%29.jpg",
+    "audio": "Flowers%20-%20Miley%20Cyrus%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Franklin's Ringtone (GTA V)",
+    "image": "Franklin%27s%20Ringtone%20%28GTA%20V%29.jpg",
+    "audio": "Franklin%27s%20Ringtone%20%28GTA%20V%29.mp3"
+  },
+  {
+    "title": "Full Metal Alchemist - Again (Ringtone)",
+    "image": "Full%20Metal%20Alchemist%20-%20Again%20%28Ringtone%29.jpg",
+    "audio": "Full%20Metal%20Alchemist%20-%20Again%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Game of Thrones - Main Theme (Ringtone)",
+    "image": "Game%20of%20Thrones%20-%20Main%20Theme%20%28Ringtone%29.jpg",
+    "audio": "Game%20of%20Thrones%20-%20Main%20Theme%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "GameCube Intro (Alarm Tone)",
+    "image": "GameCube%20Intro%20%28Alarm%20Tone%29.jpg",
+    "audio": "GameCube%20Intro%20%28Alarm%20Tone%29.mp3"
+  },
+  {
+    "title": "Ghostbusters - Theme Song (Halloween Ringtone)",
+    "image": "Ghostbusters%20-%20Theme%20Song%20%28Halloween%20Ringtone%29.jpg",
+    "audio": "Ghostbusters%20-%20Theme%20Song%20%28Halloween%20Ringtone%29.mp3"
+  },
+  {
+    "title": "Giga Chad (Ringtone)",
+    "image": "Giga%20Chad%20%28Ringtone%29.jpg",
+    "audio": "Giga%20Chad%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Giorno's Theme - Jojo's Bizarre Adventures (Ringtone)",
+    "image": "Giorno%27s%20Theme%20-%20Jojo%27s%20Bizarre%20Adventures%20%28Ringtone%29.jpg",
+    "audio": "Giorno%27s%20Theme%20-%20Jojo%27s%20Bizarre%20Adventures%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Golden - KPop Demon Hunters (Ringtone)",
+    "image": "Golden%20-%20KPop%20Demon%20Hunters%20%28Ringtone%29.jpg",
+    "audio": "Golden%20-%20KPop%20Demon%20Hunters%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Goosebumps - Travis Scott (Ringtone)",
+    "image": "Goosebumps%20-%20Travis%20Scott%20%28Ringtone%29.jpg",
+    "audio": "Goosebumps%20-%20Travis%20Scott%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "GTA San Andreas (Ringtone)",
+    "image": "GTA%20San%20Andreas%20%28Ringtone%29.jpg",
+    "audio": "GTA%20San%20Andreas%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Gusty Garden Galaxy - Super Mario Galaxy Theme (Ringtone)",
+    "image": "Gusty%20Garden%20Galaxy%20-%20Super%20Mario%20Galaxy%20Theme%20%28Ringtone%29.jpg",
+    "audio": "Gusty%20Garden%20Galaxy%20-%20Super%20Mario%20Galaxy%20Theme%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Haikyu!! - FLY HIGH!!",
+    "image": "Haikyu%21%21%20-%20FLY%20HIGH%21%21.jpg",
+    "audio": "Haikyu%21%21%20-%20FLY%20HIGH%21%21.mp3"
+  },
+  {
+    "title": "Harry Potter (Ringtone)",
+    "image": "Harry%20Potter%20%28Ringtone%29.jpg",
+    "audio": "Harry%20Potter%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Hatsune Miku - Ievan Polkka (Ringtone)",
+    "image": "Hatsune%20Miku%20-%20Ievan%20Polkka%20%28Ringtone%29.jpg",
+    "audio": "Hatsune%20Miku%20-%20Ievan%20Polkka%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Howl's Moving Castle - Merry Go Round (Ringtone)",
+    "image": "Howl%27s%20Moving%20Castle%20-%20Merry%20Go%20Round%20%28Ringtone%29.jpg",
+    "audio": "Howl%27s%20Moving%20Castle%20-%20Merry%20Go%20Round%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Hunter x Hunter (Ringtone) - Departure!",
+    "image": "Hunter%20x%20Hunter%20%28Ringtone%29%20-%20Departure%21.jpg",
+    "audio": "Hunter%20x%20Hunter%20%28Ringtone%29%20-%20Departure%21.mp3"
+  },
+  {
+    "title": "Idol (Ringtone) - Oshi no Ko",
+    "image": "Idol%20%28Ringtone%29%20-%20Oshi%20no%20Ko.jpg",
+    "audio": "Idol%20%28Ringtone%29%20-%20Oshi%20no%20Ko.mp3"
+  },
+  {
+    "title": "If We Ever Broke Up (Ringtone)",
+    "image": "If%20We%20Ever%20Broke%20Up%20%28Ringtone%29.jpg",
+    "audio": "If%20We%20Ever%20Broke%20Up%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "ILLIT - Magnetic (Ringtone)",
+    "image": "ILLIT%20-%20Magnetic%20%28Ringtone%29.jpg",
+    "audio": "ILLIT%20-%20Magnetic%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Infinity Castle - Demon Slayer (Ringtone)",
+    "image": "Infinity%20Castle%20-%20Demon%20Slayer%20%28Ringtone%29.jpg",
+    "audio": "Infinity%20Castle%20-%20Demon%20Slayer%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Jujutsu Kaisen - Kaikai Kitan (Ringtone)",
+    "image": "Jujutsu%20Kaisen%20-%20Kaikai%20Kitan%20%28Ringtone%29.jpg",
+    "audio": "Jujutsu%20Kaisen%20-%20Kaikai%20Kitan%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Jujutsu Kaisen Eyecatcher (Ringtone)",
+    "image": "Jujutsu%20Kaisen%20Eyecatcher%20%28Ringtone%29.jpg",
+    "audio": "Jujutsu%20Kaisen%20Eyecatcher%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Jump Rope Song - Kkomaya Kkomaya (from - Squid Game Season 3 - ) [Marimba Ringtone]",
+    "image": "Jump%20Rope%20Song%20-%20Kkomaya%20Kkomaya%20%28from%20%20-%20Squid%20Game%20Season%203%20-%20%29%20%5BMarimba%20Ringtone%5D.jpg",
+    "audio": "Jump%20Rope%20Song%20-%20Kkomaya%20Kkomaya%20%28from%20-%20Squid%20Game%20Season%203%20-%20%29%20%5BMarimba%20Ringtone%5D.mp3"
+  },
+  {
+    "title": "Kompa (Normal)",
+    "image": "Kompa%20-%20Frozy%20%28Ringtone%29.jpg",
+    "audio": "Kompa%20%28Normal%29.mp3"
+  },
+  {
+    "title": "L's Theme A - Death Note (Ringtone)",
+    "image": "L%27s%20Theme%20A%20-%20Death%20Note%20%28Ringtone%29.jpg",
+    "audio": "L%27s%20Theme%20A%20-%20Death%20Note%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Littleroot Town - Pokémon (Ringtone)",
+    "image": "Littleroot%20Town%20-%20Pok%C3%A9mon%20%28Ringtone%29.jpg",
+    "audio": "Littleroot%20Town%20-%20Pok%C3%A9mon%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Lonely Lonely - Vintage Eva (Ringtone)",
+    "image": "Lonely%20Lonely%20-%20Vintage%20Eva%20%28Ringtone%29.jpg",
+    "audio": "Lonely%20Lonely%20-%20Vintage%20Eva%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Lost in Paradise - Jujutsu Kaisen (Ringtone)",
+    "image": "Lost%20in%20Paradise%20-%20Jujutsu%20Kaisen%20%28Ringtone%29.jpg",
+    "audio": "Lost%20in%20Paradise%20-%20Jujutsu%20Kaisen%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Low Cortisol Song (Ringtone)",
+    "image": "Low%20Cortisol%20Song%20%28Ringtone%29.jpg",
+    "audio": "Low%20Cortisol%20Song%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Luffy",
+    "image": "ALL%20One%20Piece%20Eyecatchers%20%28Text%20Tones%20%20-%20%20Ringtones%29.jpg",
+    "audio": "Luffy.mp3"
+  },
+  {
+    "title": "Luffy's Fierce Attack - One Piece (Ringtone)",
+    "image": "Luffy%27s%20Fierce%20Attack%20-%20One%20Piece%20%28Ringtone%29.jpg",
+    "audio": "Luffy%27s%20Fierce%20Attack%20-%20One%20Piece%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "METAMORPHOSIS (Ringtone)",
+    "image": "METAMORPHOSIS%20%28Ringtone%29.jpg",
+    "audio": "METAMORPHOSIS%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Michael Jackson - Thriller (Halloween Ringtone)",
+    "image": "Michael%20Jackson%20-%20Thriller%20%28Halloween%20Ringtone%29.jpg",
+    "audio": "Michael%20Jackson%20-%20Thriller%20%28Halloween%20Ringtone%29.mp3"
+  },
+  {
+    "title": "Mii Channel Music (Ringtone)",
+    "image": "Mii%20Channel%20Music%20%28Ringtone%29.jpg",
+    "audio": "Mii%20Channel%20Music%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Million Dollar Baby (Ringtone)",
+    "image": "Million%20Dollar%20Baby%20%28Ringtone%29.jpg",
+    "audio": "Million%20Dollar%20Baby%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Mirage - Creepy Nuts [Call of the Night] (Ringtone)",
+    "image": "Mirage%20-%20Creepy%20Nuts%20%5BCall%20of%20the%20Night%5D%20%28Ringtone%29.jpg",
+    "audio": "Mirage%20-%20Creepy%20Nuts%20%5BCall%20of%20the%20Night%5D%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Montagem Ladrao - 120fps Phonk",
+    "image": "Montagem%20Ladrao%20-%20120fps%20Phonk.jpg",
+    "audio": "Montagem%20Ladrao%20-%20120fps%20Phonk.mp3"
+  },
+  {
+    "title": "Montagem Santa Fe 2 - Phonk (Ringtone)",
+    "image": "Montagem%20Santa%20Fe%202%20-%20Phonk%20%28Ringtone%29.jpg",
+    "audio": "Montagem%20Santa%20Fe%202%20-%20Phonk%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Montagem Xonada - MXZI (Ringtone)",
+    "image": "Montagem%20Xonada%20-%20MXZI%20%28Ringtone%29.jpg",
+    "audio": "Montagem%20Xonada%20-%20MXZI%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Mortal Kombat Theme (Ringtone)",
+    "image": "Mortal%20Kombat%20Theme%20%28Ringtone%29.jpg",
+    "audio": "Mortal%20Kombat%20Theme%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Moulaga (Ringtone)",
+    "image": "Moulaga%20%28Ringtone%29.jpg",
+    "audio": "Moulaga%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Mundian To Bach Ke (Indian Ringtone)",
+    "image": "Mundian%20To%20Bach%20Ke%20%28Indian%20Ringtone%29.jpg",
+    "audio": "Mundian%20To%20Bach%20Ke%20%28Indian%20Ringtone%29.mp3"
+  },
+  {
+    "title": "Mushroom Power Up - Super Mario (Notification Sound)",
+    "image": "Mushroom%20Power%20Up%20-%20Super%20Mario%20%28Notification%20Sound%29.jpg",
+    "audio": "Mushroom%20Power%20Up%20-%20Super%20Mario%20%28Notification%20Sound%29.mp3"
+  },
+  {
+    "title": "My Hero Academia - Peace Sign (Ringtone)",
+    "image": "My%20Hero%20Academia%20-%20Peace%20Sign%20%28Ringtone%29.jpg",
+    "audio": "My%20Hero%20Academia%20-%20Peace%20Sign%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Nanana - Peggy Gou (Ringtone)",
+    "image": "Nanana%20-%20Peggy%20Gou%20%28Ringtone%29.jpg",
+    "audio": "Nanana%20-%20Peggy%20Gou%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Naruto (Ringtone) - Blue Bird",
+    "image": "Naruto%20%28Ringtone%29%20-%20Blue%20Bird.jpg",
+    "audio": "Naruto%20%28Ringtone%29%20-%20Blue%20Bird.mp3"
+  },
+  {
+    "title": "Night Dancer - imase (Ringtone)",
+    "image": "Night%20Dancer%20-%20imase%20%28Ringtone%29.jpg",
+    "audio": "Night%20Dancer%20-%20imase%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "No Batidao (Phonk Ringtone)",
+    "image": "No%20Batidao%20%28Phonk%20Ringtone%29.jpg",
+    "audio": "No%20Batidao%20%28Phonk%20Ringtone%29.mp3"
+  },
+  {
+    "title": "No Batidao (Phonk)",
+    "image": "-%20without%20iPhone%20intro%20-%20%20ALL%20RINGTONES.jpg",
+    "audio": "No%20Batidao%20%28Phonk%29.mp3"
+  },
+  {
+    "title": "Nokia - PLUGGNB x NEW JAZZ (Ringtone)",
+    "image": "Nokia%20-%20PLUGGNB%20x%20NEW%20JAZZ%20%28Ringtone%29.jpg",
+    "audio": "Nokia%20-%20PLUGGNB%20x%20NEW%20JAZZ%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Nunca Muda - Phonk (Ringtone)",
+    "image": "Nunca%20Muda%20-%20Phonk%20%28Ringtone%29.jpg",
+    "audio": "Nunca%20Muda%20-%20Phonk%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "O I I A E - Spinning Cat (Original)",
+    "image": "O%20I%20I%20A%20E%20-%20Spinning%20Cat%20%28Ringtone%29.jpg",
+    "audio": "O%20I%20I%20A%20E%20-%20Spinning%20Cat%20%28Original%29.mp3"
+  },
+  {
+    "title": "OMG - NewJeans (Ringtone)",
+    "image": "OMG%20-%20NewJeans%20%28Ringtone%29.jpg",
+    "audio": "OMG%20-%20NewJeans%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "One Piece (Ringtone) - We Are!",
+    "image": "One%20Piece%20%28Ringtone%29%20-%20We%20Are%21.jpg",
+    "audio": "One%20Piece%20%28Ringtone%29%20-%20We%20Are%21.mp3"
+  },
+  {
+    "title": "One Piece - Drums of Liberation (Ringtone)",
+    "image": "One%20Piece%20-%20Drums%20of%20Liberation%20%28Ringtone%29.jpg",
+    "audio": "One%20Piece%20-%20Drums%20of%20Liberation%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "One Piece - Let's Battle (Ringtone)",
+    "image": "One%20Piece%20-%20Let%27s%20Battle%20%28Ringtone%29.jpg",
+    "audio": "One%20Piece%20-%20Let%27s%20Battle%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "PEDRO PEDRO (Ringtone)",
+    "image": "PEDRO%20PEDRO%20%28Ringtone%29.jpg",
+    "audio": "PEDRO%20PEDRO%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Pikachu (Alarm Tone)",
+    "image": "Pikachu%20%28Alarm%20Tone%29.jpg",
+    "audio": "Pikachu%20%28Alarm%20Tone%29.mp3"
+  },
+  {
+    "title": "Playboi Carti - Vamp Anthem (Ringtone)",
+    "image": "Playboi%20Carti%20-%20Vamp%20Anthem%20%28Ringtone%29.jpg",
+    "audio": "Playboi%20Carti%20-%20Vamp%20Anthem%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Pokémon Battle - Gold & Silver (Ringtone)",
+    "image": "Pok%C3%A9mon%20Battle%20-%20Gold%20%26%20Silver%20%28Ringtone%29.jpg",
+    "audio": "Pok%C3%A9mon%20Battle%20-%20Gold%20%26%20Silver%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Pokémon Red & Blue - Opening Theme (Marimba Ringtone)",
+    "image": "Pok%C3%A9mon%20Red%20%26%20Blue%20-%20Opening%20Theme%20%28Marimba%20Ringtone%29.jpg",
+    "audio": "Pok%C3%A9mon%20Red%20%26%20Blue%20-%20Opening%20Theme%20%28Marimba%20Ringtone%29.mp3"
+  },
+  {
+    "title": "Racing Into the Night (Ringtone)",
+    "image": "Racing%20Into%20the%20Night%20%28Ringtone%29%20-%20YOASOBI.jpg",
+    "audio": "Racing%20Into%20the%20Night%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Rick Roll - Never Gonna Give You Up (Ringtone)",
+    "image": "Rick%20Roll%20-%20Never%20Gonna%20Give%20You%20Up%20%28Ringtone%29.jpg",
+    "audio": "Rick%20Roll%20-%20Never%20Gonna%20Give%20You%20Up%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Sadness and Sorrow - Naruto (Ringtone)",
+    "image": "Sadness%20and%20Sorrow%20-%20Naruto%20%28Ringtone%29.jpg",
+    "audio": "Sadness%20and%20Sorrow%20-%20Naruto%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Sasageyo - Attack on Titan (Ringtone)",
+    "image": "Sasageyo%20-%20Attack%20on%20Titan%20%28Ringtone%29.jpg",
+    "audio": "Sasageyo%20-%20Attack%20on%20Titan%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Seven - Jung Kook (Ringtone)",
+    "image": "Seven%20-%20Jung%20Kook%20%28Ringtone%29.jpg",
+    "audio": "Seven%20-%20Jung%20Kook%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Shinunoga E-Wa (Ringtone)",
+    "image": "Shinunoga%20E-Wa%20%28Ringtone%29.jpg",
+    "audio": "Shinunoga%20E-Wa%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Sigma Boy - Betsy (Ringtone)",
+    "image": "Sigma%20Boy%20-%20Betsy%20%28Ringtone%29.jpg",
+    "audio": "Sigma%20Boy%20-%20Betsy%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Silhouette - Naruto (Ringtone)",
+    "image": "Silhouette%20-%20Naruto%20%28Ringtone%29.jpg",
+    "audio": "Silhouette%20-%20Naruto%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "SLAY! - Eternxlkz (Ringtone)",
+    "image": "SLAY%21%20-%20Eternxlkz%20%28Ringtone%29.jpg",
+    "audio": "SLAY%21%20-%20Eternxlkz%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Snowfall - One Heart (Alarm)",
+    "image": "Snowfall%20-%20One%20Heart%20%28Alarm%29.jpg",
+    "audio": "Snowfall%20-%20One%20Heart%20%28Alarm%29.mp3"
+  },
+  {
+    "title": "Soda Pop - KPop Demon Hunters (Ringtone)",
+    "image": "Soda%20Pop%20-%20KPop%20Demon%20Hunters%20%28Ringtone%29.jpg",
+    "audio": "Soda%20Pop%20-%20KPop%20Demon%20Hunters%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Solo Leveling - Dark Aria (Ringtone)",
+    "image": "Solo%20Leveling%20-%20Dark%20Aria%20%28Ringtone%29.jpg",
+    "audio": "Solo%20Leveling%20-%20Dark%20Aria%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Sonic - Green Hill (Ringtone)",
+    "image": "Sonic%20-%20Green%20Hill%20%28Ringtone%29.jpg",
+    "audio": "Sonic%20-%20Green%20Hill%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Specialz - Jujutsu Kaisen (Ringtone)",
+    "image": "Specialz%20-%20Jujutsu%20Kaisen%20%28Ringtone%29.jpg",
+    "audio": "Specialz%20-%20Jujutsu%20Kaisen%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Spirited Away - One Summer's Day (Ringtone)",
+    "image": "Spirited%20Away%20-%20One%20Summer%27s%20Day%20%28Ringtone%29.jpg",
+    "audio": "Spirited%20Away%20-%20One%20Summer%27s%20Day%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Spy x Family - Comedy (Ringtone)",
+    "image": "Spy%20x%20Family%20-%20Comedy%20%28Ringtone%29.jpg",
+    "audio": "Spy%20x%20Family%20-%20Comedy%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Squid Game - Round and Round Mingle (Ringtone)",
+    "image": "Squid%20Game%20-%20Round%20and%20Round%20Mingle%20%28Ringtone%29.jpg",
+    "audio": "Squid%20Game%20-%20Round%20and%20Round%20Mingle%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Strangers - Kenya Grace (Ringtone)",
+    "image": "Strangers%20-%20Kenya%20Grace%20%28Ringtone%29.jpg",
+    "audio": "Strangers%20-%20Kenya%20Grace%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Super Mario (Ringtone)",
+    "image": "Super%20Mario%20%28Ringtone%29.jpg",
+    "audio": "Super%20Mario%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Super Shy - NewJeans (Ringtone)",
+    "image": "Super%20Shy%20-%20NewJeans%20%28Ringtone%29.jpg",
+    "audio": "Super%20Shy%20-%20NewJeans%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Supido - Frozy (Ringtone)",
+    "image": "Supido%20-%20Frozy%20%28Ringtone%29.jpg",
+    "audio": "Supido%20-%20Frozy%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Suzume - Theme Song (Ringtone)",
+    "image": "Suzume%20-%20Theme%20Song%20%28Ringtone%29.jpg",
+    "audio": "Suzume%20-%20Theme%20Song%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Sword Art Online - Crossing Field (Ringtone)",
+    "image": "Sword%20Art%20Online%20-%20Crossing%20Field%20%28Ringtone%29.jpg",
+    "audio": "Sword%20Art%20Online%20-%20Crossing%20Field%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Tabun たぶん - YOASOBI (Ringtone)",
+    "image": "Tabun%20%E3%81%9F%E3%81%B5%E3%82%99%E3%82%93%20-%20YOASOBI%20%28Ringtone%29.jpg",
+    "audio": "Tabun%20%E3%81%9F%E3%81%B5%E3%82%99%E3%82%93%20-%20YOASOBI%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Tanjiro no Uta (Ringtone) - Demon Slayer",
+    "image": "Tanjiro%20no%20Uta%20%28Ringtone%29%20-%20Demon%20Slayer.jpg",
+    "audio": "Tanjiro%20no%20Uta%20%28Ringtone%29%20-%20Demon%20Slayer.mp3"
+  },
+  {
+    "title": "Tapion's Theme - Dragon Ball (Ringtone)",
+    "image": "Tapion%27s%20Theme%20-%20Dragon%20Ball%20%28Ringtone%29.jpg",
+    "audio": "Tapion%27s%20Theme%20-%20Dragon%20Ball%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Tetris Theme (Ringtone)",
+    "image": "Tetris%20Theme%20%28Ringtone%29.jpg",
+    "audio": "Tetris%20Theme%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "That One Brazilian Kid - MC Menor JP (Ringtone)",
+    "image": "That%20One%20Brazilian%20Kid%20-%20MC%20Menor%20JP%20%28Ringtone%29.jpg",
+    "audio": "That%20One%20Brazilian%20Kid%20-%20MC%20Menor%20JP%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "The Next Episode - Snoop Dogg & Dr Dre (Ringtone)",
+    "image": "The%20Next%20Episode%20-%20Snoop%20Dogg%20%26%20Dr%20Dre%20%28Ringtone%29.jpg",
+    "audio": "The%20Next%20Episode%20-%20Snoop%20Dogg%20%26%20Dr%20Dre%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "The Next Station is Shibuya (Ringtone)",
+    "image": "The%20Next%20Station%20is%20Shibuya%20%28Ringtone%29.jpg",
+    "audio": "The%20Next%20Station%20is%20Shibuya%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "The Rumbling - Attack on Titan (Ringtone)",
+    "image": "The%20Rumbling%20-%20Attack%20on%20Titan%20%28Ringtone%29.jpg",
+    "audio": "The%20Rumbling%20-%20Attack%20on%20Titan%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "The Very Strongest - One Piece (Ringtone)",
+    "image": "The%20Very%20Strongest%20-%20One%20Piece%20%28Ringtone%29.jpg",
+    "audio": "The%20Very%20Strongest%20-%20One%20Piece%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Toca Toca (Ringtone)",
+    "image": "Toca%20Toca%20%28Ringtone%29.jpg",
+    "audio": "Toca%20Toca%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Tokyo Ghoul - Unravel (Ringtone)",
+    "image": "Tokyo%20Ghoul%20-%20Unravel%20%28Ringtone%29.jpg",
+    "audio": "Tokyo%20Ghoul%20-%20Unravel%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Tokyo Revengers - Cry Baby (Ringtone)",
+    "image": "Tokyo%20Revengers%20-%20Cry%20Baby%20%28Ringtone%29.jpg",
+    "audio": "Tokyo%20Revengers%20-%20Cry%20Baby%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Totally Spies (Alarm Tone)",
+    "image": "Totally%20Spies%20%28Alarm%20Tone%29.jpg",
+    "audio": "Totally%20Spies%20%28Alarm%20Tone%29.mp3"
+  },
+  {
+    "title": "Tourner dans le vide - Indila (Ringtone)",
+    "image": "Tourner%20dans%20le%20vide%20-%20Indila%20%28Ringtone%29.jpg",
+    "audio": "Tourner%20dans%20le%20vide%20-%20Indila%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "TUCA DONKA - Hakari Dance (Ringtone)",
+    "image": "TUCA%20DONKA%20-%20Hakari%20Dance%20%28Ringtone%29.jpg",
+    "audio": "TUCA%20DONKA%20-%20Hakari%20Dance%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Turn the Lights Off (Ringtone)",
+    "image": "Turn%20the%20Lights%20Off%20%28Ringtone%29.jpg",
+    "audio": "Turn%20the%20Lights%20Off%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Ultra Instinct Theme - Dragon Ball Super (Ringtone)",
+    "image": "Ultra%20Instinct%20Theme%20-%20Dragon%20Ball%20Super%20%28Ringtone%29.jpg",
+    "audio": "Ultra%20Instinct%20Theme%20-%20Dragon%20Ball%20Super%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Venom - Eminem (Ringtone)",
+    "image": "Venom%20-%20Eminem%20%28Ringtone%29.jpg",
+    "audio": "Venom%20-%20Eminem%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "What it is (Ringtone)",
+    "image": "What%20it%20is%20%28Ringtone%29.jpg",
+    "audio": "What%20it%20is%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Where Our Blue Is - Jujutsu Kaisen (Ringtone)",
+    "image": "Where%20Our%20Blue%20Is%20-%20Jujutsu%20Kaisen%20%28Ringtone%29.jpg",
+    "audio": "Where%20Our%20Blue%20Is%20-%20Jujutsu%20Kaisen%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Your Idol - Saja Boys (KPop Demon Hunters Ringtone)",
+    "image": "Your%20Idol%20-%20Saja%20Boys%20%28KPop%20Demon%20Hunters%20Ringtone%29.jpg",
+    "audio": "Your%20Idol%20-%20Saja%20Boys%20%28KPop%20Demon%20Hunters%20Ringtone%29.mp3"
+  },
+  {
+    "title": "Your Lie in April (Ringtone)",
+    "image": "Your%20Lie%20in%20April%20%28Ringtone%29.jpg",
+    "audio": "Your%20Lie%20in%20April%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Zelda Theme (Ringtone)",
+    "image": "Zelda%20Theme%20%28Ringtone%29.jpg",
+    "audio": "Zelda%20Theme%20%28Ringtone%29.mp3"
+  },
+  {
+    "title": "Zenitsu Theme - Demon Slayer (Ringtone)",
+    "image": "Zenitsu%20Theme%20-%20Demon%20Slayer%20%28Ringtone%29.jpg",
+    "audio": "Zenitsu%20Theme%20-%20Demon%20Slayer%20%28Ringtone%29.mp3"
+  }
+];
+
+    const grid = document.getElementById("grid");
+    const counter = document.getElementById("counter");
+    const search = document.getElementById("search");
+    const clearSearch = document.getElementById("clearSearch");
+    const player = document.getElementById("player");
+    const nowPlaying = document.getElementById("nowPlaying");
+    const nowTitle = document.getElementById("nowTitle");
+    const stopBtn = document.getElementById("stopBtn");
+    const empty = document.getElementById("empty");
+
+    let currentAudio = "";
+    let currentButton = null;
+    let currentCard = null;
+
+    function getExt(url) {
+      const clean = String(url || "").split("?")[0].split("#")[0];
+      const part = clean.substring(clean.lastIndexOf("/") + 1);
+      const dot = part.lastIndexOf(".");
+      return dot >= 0 ? part.substring(dot) : ".mp3";
+    }
+
+    function stopUi() {
+      if (currentButton) {
+        currentButton.textContent = "▶ Play";
+        currentButton.classList.remove("is-playing");
+      }
+      if (currentCard) {
+        currentCard.classList.remove("is-playing");
+      }
+      currentButton = null;
+      currentCard = null;
+      currentAudio = "";
+      nowPlaying.classList.remove("is-visible");
+      nowTitle.textContent = "Сейчас играет";
+    }
+
+    function stopAudio() {
+      player.pause();
+      player.removeAttribute("src");
+      player.load();
+      stopUi();
+    }
+
+    function makeCard(track, index) {
+      const card = document.createElement("article");
+      card.className = "card";
+      card.dataset.title = String(track.title || "").toLowerCase();
+
+      const coverWrap = document.createElement("div");
+      coverWrap.className = "cover-wrap";
+
+      const img = document.createElement("img");
+      img.className = "cover";
+      img.src = track.image;
+      img.alt = track.title;
+      img.loading = "lazy";
+      img.onerror = () => {
+        img.style.display = "none";
+        coverWrap.style.display = "flex";
+        coverWrap.style.alignItems = "center";
+        coverWrap.style.justifyContent = "center";
+        coverWrap.style.color = "#4f46e5";
+        coverWrap.style.fontWeight = "900";
+        coverWrap.textContent = "No image";
+      };
+
+      const bubble = document.createElement("div");
+      bubble.className = "play-bubble";
+      bubble.textContent = "♪";
+
+      coverWrap.appendChild(img);
+      coverWrap.appendChild(bubble);
+
+      const title = document.createElement("div");
+      title.className = "title";
+      title.textContent = track.title;
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+
+      const playBtn = document.createElement("button");
+      playBtn.className = "btn play-btn";
+      playBtn.type = "button";
+      playBtn.textContent = "▶ Play";
+
+      playBtn.addEventListener("click", async () => {
+        if (currentAudio === track.audio && !player.paused) {
+          player.pause();
+          playBtn.textContent = "▶ Play";
+          playBtn.classList.remove("is-playing");
+          card.classList.remove("is-playing");
+          nowPlaying.classList.remove("is-visible");
+          return;
+        }
+
+        stopUi();
+
+        currentAudio = track.audio;
+        currentButton = playBtn;
+        currentCard = card;
+
+        player.src = track.audio;
+
+        try {
+          await player.play();
+          playBtn.textContent = "⏸ Pause";
+          playBtn.classList.add("is-playing");
+          card.classList.add("is-playing");
+          nowTitle.textContent = "Сейчас играет: " + track.title;
+          nowPlaying.classList.add("is-visible");
+        } catch (e) {
+          stopUi();
+          alert("Не получилось включить аудио. Проверь файл:\n" + track.audio);
+        }
+      });
+
+      const download = document.createElement("a");
+      download.className = "btn download-btn";
+      download.href = track.audio;
+      download.download = track.title + getExt(track.audio);
+      download.textContent = "⬇ Скачать";
+
+      actions.appendChild(playBtn);
+      actions.appendChild(download);
+
+      card.appendChild(coverWrap);
+      card.appendChild(title);
+      card.appendChild(actions);
+
+      return card;
+    }
+
+    function render() {
+      grid.innerHTML = "";
+      tracks.forEach((track, index) => grid.appendChild(makeCard(track, index)));
+      filterCards();
+    }
+
+    function filterCards() {
+      const q = search.value.trim().toLowerCase();
+      let visible = 0;
+
+      document.querySelectorAll(".card").forEach(card => {
+        const ok = card.dataset.title.includes(q);
+        card.style.display = ok ? "block" : "none";
+        if (ok) visible++;
+      });
+
+      counter.textContent = visible + " / " + tracks.length;
+      empty.classList.toggle("is-visible", visible === 0);
+    }
+
+    search.addEventListener("input", filterCards);
+    clearSearch.addEventListener("click", () => {
+      search.value = "";
+      filterCards();
+      search.focus();
+    });
+
+    stopBtn.addEventListener("click", stopAudio);
+
+    player.addEventListener("ended", stopUi);
+    player.addEventListener("pause", () => {
+      if (currentButton && player.currentTime > 0 && !player.ended) {
+        currentButton.textContent = "▶ Play";
+        currentButton.classList.remove("is-playing");
+        if (currentCard) currentCard.classList.remove("is-playing");
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
